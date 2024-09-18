@@ -1,0 +1,23 @@
+{
+  "name": "mobtwin_gplay_api",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon",
+    "start": "node src/index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "axios-https-proxy-fix": "^0.17.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "g-scraper": "^1.1.3",
+    "google-play-scraper": "^9.1.0",
+    "http-proxy": "^1.18.1"
+  }
+}
