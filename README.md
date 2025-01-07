@@ -1,1 +1,1 @@
-# mobtwin_api# mobtwin_gplay_api
+# mobtwin_api

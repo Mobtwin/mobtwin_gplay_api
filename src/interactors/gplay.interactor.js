@@ -13,7 +13,7 @@ const proxyStorage = new Proxy();
 // memoized functions
 //const gplay = memoized({ maxAge: 1000 * 60 * 60, max: 10 });
 
-const gplay = g_play
+const gplay = g_play;
 
 // available url's
 export const index = async (req, res) =>
@@ -42,30 +42,33 @@ export const searchApps = async (req, res, next) => {
     }
     return apps;
   }
-const proxy = proxyStorage.getNextProxy();
-  if(proxy){
+  const proxy = proxyStorage.getNextProxy();
+  if (true) {
     gplay
-    .search({
-      throttle: THROTTLE,
-      term: req.query.q,
-      lang: req.query.lang,
-      country: req.query.country,
-      price: req.query.price,
-      proxy,
-    })
-    .then((apps) => apps.slice(start, start + num).map(cleanUrls(req)))
-    .then(toList)
-    .then(paginate)
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        searchApps(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .search({
+        throttle: THROTTLE,
+        term: req.query.q,
+        lang: req.query.lang,
+        country: req.query.country,
+        price: req.query.price,
+        /*proxy,*/
+      })
+      .then((apps) => apps.slice(start, start + num).map(cleanUrls(req)))
+      .then(toList)
+      .then(paginate)
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          searchApps(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -81,27 +84,30 @@ export const searchSuggestions = async (req, res, next) => {
     url: buildUrl(req, "apps/") + "?" + qs.stringify({ q: term }),
   });
   const proxy = proxyStorage.getNextProxy();
-  if(proxy){
+  if (true) {
     gplay
-    .suggest({
-      throttle: THROTTLE,
-      term: req.query.suggest,
-      lang: req.query.lang,
-      country: req.query.country,
-      proxy,
-    })
-    .then((terms) => terms.map(toJSON))
-    .then(toList)
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        searchSuggestions(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .suggest({
+        throttle: THROTTLE,
+        term: req.query.suggest,
+        lang: req.query.lang,
+        country: req.query.country,
+        /*proxy,*/
+      })
+      .then((terms) => terms.map(toJSON))
+      .then(toList)
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          searchSuggestions(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -125,25 +131,28 @@ export const getApps = async (req, res, next) => {
     }
     const opt = req.query;
     const proxy = proxyStorage.getNextProxy();
-    if(proxy){
+    if (true) {
       gplay
-      .list({
-        ...opt,
-        proxy,
-      })
-      .then((apps) => apps.slice(start, start + num).map(cleanUrls(req)))
-      .then(toList)
-      .then(paginate)
-      .then(res.json.bind(res))
-      .catch(err=>{
-        if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-          proxyStorage.checkActiveOne(proxy);
-          getApps(req,res,next);
-        }else{
-          next(err);
-        }
-      });
-    }else{
+        .list({
+          ...opt,
+          /*proxy,*/
+        })
+        .then((apps) => apps.slice(start, start + num).map(cleanUrls(req)))
+        .then(toList)
+        .then(paginate)
+        .then(res.json.bind(res))
+        .catch((err) => {
+          if (
+            err.message ===
+            "Error requesting Google Play:timeout of 5000ms exceeded"
+          ) {
+            proxyStorage.checkActiveOne(proxy);
+            getApps(req, res, next);
+          } else {
+            next(err);
+          }
+        });
+    } else {
       res.json({ message: "no proxy available" });
     }
   }
@@ -151,24 +160,26 @@ export const getApps = async (req, res, next) => {
 
 // app details
 export const getAppDetails = async (req, res, next) => {
-
   const appId = req.params.appId;
   const opt = req.query;
   const proxy = proxyStorage.getNextProxy();
-  if(proxy){
+  if (true) {
     gplay
-    .app({ appId, proxy, ...opt})
-    //.then((app) => cleanUrls(req)(app))
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        getAppDetails(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .app({ appId, /*proxy,*/ ...opt })
+      //.then((app) => cleanUrls(req)(app))
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          getAppDetails(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -176,27 +187,30 @@ export const getAppDetails = async (req, res, next) => {
 //similar apps
 export const getSimilarApps = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
-  if(proxy){
+  if (true) {
     gplay
-    .similar({
-      throttle: THROTTLE,
-      appId: req.params.appId,
-      country: req.query.country,
-      lang: req.query.lang,
-      proxy,
-    })
-    .then((apps) => apps.map(cleanUrls(req)))
-    .then(toList)
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        getSimilarApps(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .similar({
+        throttle: THROTTLE,
+        appId: req.params.appId,
+        country: req.query.country,
+        lang: req.query.lang,
+        /*proxy,*/
+      })
+      .then((apps) => apps.map(cleanUrls(req)))
+      .then(toList)
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          getSimilarApps(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -204,20 +218,24 @@ export const getSimilarApps = async (req, res, next) => {
 // app data safety
 export const getAppDatasafety = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
-  const opts = Object.assign(
-    { appId: req.params.appId, proxy },
-    req.query
-  );
-  if(proxy){
-    gplay.datasafety(opts).then(toList).then(res.json.bind(res)).catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        getAppDatasafety(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+  const opts = Object.assign({ appId: req.params.appId, proxy }, req.query);
+  if (true) {
+    gplay
+      .datasafety(opts)
+      .then(toList)
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          getAppDatasafety(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -225,25 +243,28 @@ export const getAppDatasafety = async (req, res, next) => {
 // app permissions
 export const getAppPermissions = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
-  if(proxy){
+  if (true) {
     gplay
-    .permissions({
-      ...req.query,
-      throttle: THROTTLE,
-      appId: req.params.appId,
-      proxy,
-    })
-    .then(toList)
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        getAppPermissions(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .permissions({
+        ...req.query,
+        throttle: THROTTLE,
+        appId: req.params.appId,
+        /*proxy,*/
+      })
+      .then(toList)
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          getAppPermissions(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -264,26 +285,29 @@ export const getAppReviews = async (req, res, next) => {
   };
   const proxy = proxyStorage.getNextProxy();
   const opts = req.query;
-  if(proxy){
+  if (true) {
     gplay
-    .reviews({
-      ...opts,
-      throttle: THROTTLE,
-      appId: req.params.appId,
-      num: 10,
-      proxy,
-    })
-    .then(correctTheResult)
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        getAppReviews(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .reviews({
+        ...opts,
+        throttle: THROTTLE,
+        appId: req.params.appId,
+        num: 10,
+        /*proxy,*/
+      })
+      .then(correctTheResult)
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          getAppReviews(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -292,25 +316,28 @@ export const getAppReviews = async (req, res, next) => {
 export const getDeveloperApps = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
   const opts = { devId: req.params.devId, ...req.query, proxy };
-  if(proxy){
+  if (true) {
     gplay
-    .developer(opts)
-    .then((apps) => apps.map(cleanUrls(req)))
-    .then((apps) => ({
-      devId: req.params.devId,
-      apps,
-      proxy: proxyStorage.getNextProxy(),
-    }))
-    .then(res.json.bind(res))
-    .catch(err=>{
-      if(err.message === "Error requesting Google Play:timeout of 5000ms exceeded"){
-        proxyStorage.checkActiveOne(proxy);
-        getDeveloperApps(req,res,next);
-      }else{
-        next(err);
-      }
-    });
-  }else{
+      .developer(opts)
+      .then((apps) => apps.map(cleanUrls(req)))
+      .then((apps) => ({
+        devId: req.params.devId,
+        apps,
+        proxy: proxyStorage.getNextProxy(),
+      }))
+      .then(res.json.bind(res))
+      .catch((err) => {
+        if (
+          err.message ===
+          "Error requesting Google Play:timeout of 5000ms exceeded"
+        ) {
+          proxyStorage.checkActiveOne(proxy);
+          getDeveloperApps(req, res, next);
+        } else {
+          next(err);
+        }
+      });
+  } else {
     res.json({ message: "no proxy available" });
   }
 };
@@ -343,7 +370,7 @@ export const proxy_add = async (req, res) => {
   if (req.body?.proxies) {
     proxyStorage.addProxies(req.body.proxies);
     res.json({
-      message : "successfully received"
+      message: "successfully received",
     });
   } else {
     res.json({
@@ -379,11 +406,11 @@ export const checkInactiveProxiesHealth = async (req, res) => {
   res.json({
     message: "checking inactive proxies health",
   });
-}
+};
 
 export const clearInactiveProxies = async (req, res) => {
   proxyStorage.removeInActiveProxies();
   res.json({
     message: "clearing inactive proxies",
   });
-}
+};
