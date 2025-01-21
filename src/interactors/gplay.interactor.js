@@ -16,12 +16,11 @@ const proxyStorage = new Proxy();
 const gplay = g_play;
 
 // available url's
-export const index = async (req, res) =>
-  res.json({
-    apps: buildUrl(req, "apps"),
-    developers: buildUrl(req, "developers"),
-    categories: buildUrl(req, "categories"),
-  });
+export const index = async (req, res) => res.json({
+  apps: buildUrl(req, "apps"),
+  developers: buildUrl(req, "developers"),
+  categories: buildUrl(req, "categories"),
+});
 
 // app search
 export const searchApps = async (req, res, next) => {
@@ -43,7 +42,7 @@ export const searchApps = async (req, res, next) => {
     return apps;
   }
   const proxy = proxyStorage.getNextProxy();
-  if (true) {
+  if (proxy) {
     gplay
       .search({
         throttle: THROTTLE,
@@ -51,7 +50,7 @@ export const searchApps = async (req, res, next) => {
         lang: req.query.lang,
         country: req.query.country,
         price: req.query.price,
-        /*proxy,*/
+        proxy,
       })
       .then((apps) => apps.slice(start, start + num).map(cleanUrls(req)))
       .then(toList)
@@ -84,14 +83,14 @@ export const searchSuggestions = async (req, res, next) => {
     url: buildUrl(req, "apps/") + "?" + qs.stringify({ q: term }),
   });
   const proxy = proxyStorage.getNextProxy();
-  if (true) {
+  if (proxy) {
     gplay
       .suggest({
         throttle: THROTTLE,
         term: req.query.suggest,
         lang: req.query.lang,
         country: req.query.country,
-        /*proxy,*/
+        proxy,
       })
       .then((terms) => terms.map(toJSON))
       .then(toList)
@@ -131,11 +130,11 @@ export const getApps = async (req, res, next) => {
     }
     const opt = req.query;
     const proxy = proxyStorage.getNextProxy();
-    if (true) {
+    if (proxy) {
       gplay
         .list({
           ...opt,
-          /*proxy,*/
+          proxy,
         })
         .then((apps) => apps.slice(start, start + num).map(cleanUrls(req)))
         .then(toList)
@@ -163,9 +162,9 @@ export const getAppDetails = async (req, res, next) => {
   const appId = req.params.appId;
   const opt = req.query;
   const proxy = proxyStorage.getNextProxy();
-  if (true) {
+  if (proxy) {
     gplay
-      .app({ appId, /*proxy,*/ ...opt })
+      .app({ appId, proxy, ...opt })
       //.then((app) => cleanUrls(req)(app))
       .then(res.json.bind(res))
       .catch((err) => {
@@ -187,14 +186,14 @@ export const getAppDetails = async (req, res, next) => {
 //similar apps
 export const getSimilarApps = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
-  if (true) {
+  if (proxy) {
     gplay
       .similar({
         throttle: THROTTLE,
         appId: req.params.appId,
         country: req.query.country,
         lang: req.query.lang,
-        /*proxy,*/
+        proxy,
       })
       .then((apps) => apps.map(cleanUrls(req)))
       .then(toList)
@@ -219,7 +218,7 @@ export const getSimilarApps = async (req, res, next) => {
 export const getAppDatasafety = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
   const opts = Object.assign({ appId: req.params.appId, proxy }, req.query);
-  if (true) {
+  if (proxy) {
     gplay
       .datasafety(opts)
       .then(toList)
@@ -243,13 +242,13 @@ export const getAppDatasafety = async (req, res, next) => {
 // app permissions
 export const getAppPermissions = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
-  if (true) {
+  if (proxy) {
     gplay
       .permissions({
         ...req.query,
         throttle: THROTTLE,
         appId: req.params.appId,
-        /*proxy,*/
+        proxy,
       })
       .then(toList)
       .then(res.json.bind(res))
@@ -285,14 +284,14 @@ export const getAppReviews = async (req, res, next) => {
   };
   const proxy = proxyStorage.getNextProxy();
   const opts = req.query;
-  if (true) {
+  if (proxy) {
     gplay
       .reviews({
         ...opts,
         throttle: THROTTLE,
         appId: req.params.appId,
         num: 10,
-        /*proxy,*/
+        proxy,
       })
       .then(correctTheResult)
       .then(res.json.bind(res))
@@ -316,7 +315,7 @@ export const getAppReviews = async (req, res, next) => {
 export const getDeveloperApps = async (req, res, next) => {
   const proxy = proxyStorage.getNextProxy();
   const opts = { devId: req.params.devId, ...req.query, proxy };
-  if (true) {
+  if (proxy) {
     gplay
       .developer(opts)
       .then((apps) => apps.map(cleanUrls(req)))
@@ -370,7 +369,7 @@ export const proxy_add = async (req, res) => {
   if (req.body?.proxies) {
     proxyStorage.addProxies(req.body.proxies);
     res.json({
-      message: "successfully received",
+      message: "proxies successfully received",
     });
   } else {
     res.json({
@@ -414,3 +413,4 @@ export const clearInactiveProxies = async (req, res) => {
     message: "clearing inactive proxies",
   });
 };
+

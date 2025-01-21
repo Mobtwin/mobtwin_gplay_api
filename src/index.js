@@ -12,19 +12,15 @@ const app = express();
 const server = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 
-
-
 //middlewares
 app.use(cors({origin: '*'}));
 app.use(express.json());
 app.use('/api/', appRouter);
 app.use('/proxy/', proxyRouter);
 
-
 app.get('/', function (req, res) {
   res.redirect('/api');
 });
-
 
 server.listen(PORT, () => {
     console.log(`Server is listening on http://localhost:${PORT}`);
