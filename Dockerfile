@@ -2,7 +2,6 @@
 FROM node:20 AS stage
 # Set NODE_ENV to production
 ENV PORT=8080
-RUN npm install -g pm2
 FROM stage
 # Set the working directory inside the container
 WORKDIR /var/www/gp-api
@@ -21,7 +20,7 @@ EXPOSE 8080
 
 
 # Start the application
-ENTRYPOINT ["pm2", "start", "ecosystem.config.cjs", "--no-daemon"]
+ENTRYPOINT ["npm", "start"]
 
 #command build
 #docker build -f Dockerfile.run -t user_mobtwin .
