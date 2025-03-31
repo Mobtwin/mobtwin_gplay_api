@@ -3,24 +3,31 @@ import https from 'https'
 
 
 export class Proxy {
-    activeProxies = [];
-    inActiveProxies = [];
-    currentProxyIndex = 0;
-  
-    addProxies = async (stringProxies) => {
-        stringProxies.forEach(async (proxy) => {
-        proxy = await this.toProxyObject(proxy)
-        await this.addProxy(proxy);
-      });
-      return {
-        activeProxies: this.activeProxies,
-        inActiveProxies: this.inActiveProxies,
-      };
+  activeProxies = [];
+  inActiveProxies = [];
+  currentProxyIndex = 0;
+
+  addProxies = async (stringProxies) => {
+    stringProxies.forEach(async (proxy) => {
+      proxy = await this.toProxyObject(proxy)
+      await this.addProxy(proxy);
+    });
+    return {
+      activeProxies: this.activeProxies,
+      inActiveProxies: this.inActiveProxies,
     };
-    addProxy = async (proxy) => {
-      await this.checkProxy(proxy).then((isValid) => {
-        isValid ? this.addActiveOne(proxy) : this.addInActiveOne(proxy);
-      });
+  };
+  addProxy = async (proxy) => {
+    await this.checkProxy(proxy).then((isValid) => {
+      if (isValid) {
+        this.addActiveOne(proxy);
+        console.log(`Proxy ${proxy.host} is active`);
+      } else {
+        this.addInActiveOne(proxy);
+        console.log(`Proxy ${proxy.host} is inactive`);
+      }
+    }
+    );
     };
     checkProxy = async (proxy) => {
       try {
@@ -29,7 +36,7 @@ export class Proxy {
           {
             proxy: {
               ...proxy,
-              httpAgent: https.Agent({ keepAlive: true }) 
+              httpAgent: https.Agent({ keepAlive: true })
             },
             timeout: 50000,
           }
@@ -39,9 +46,9 @@ export class Proxy {
         return false;
       }
     };
-    checkActiveOne = async (proxy)=>{
+    checkActiveOne = async (proxy) => {
       let isActive = await this.checkProxy(proxy);
-      if(!isActive){
+      if (!isActive) {
         this.removeActiveOne(proxy);
         this.addInActiveOne(proxy);
       }
@@ -50,32 +57,32 @@ export class Proxy {
       if (this.activeProxies.length) {
         const proxy = this.activeProxies[this.currentProxyIndex];
         this.currentProxyIndex = (this.currentProxyIndex + 1) % this.activeProxies.length;
-        console.log("index:",this.currentProxyIndex, " proxy :", proxy)
+        console.log("index:", this.currentProxyIndex, " proxy :", proxy)
         return proxy;
       }
     };
     addActiveOne = (proxy) => {
       let isExist = false;
       this.activeProxies.map((px) => {
-        if (px.host === proxy.host) isExist = true;
+        if (px.host === proxy.host && px.port === proxy.port) isExist = true;
       });
       !isExist ? this.activeProxies.push(proxy) : null;
     };
     removeActiveOne = (proxy) => {
-        this.activeProxies = this.activeProxies.filter((px) => proxy.host != px.host);
+      this.activeProxies = this.activeProxies.filter((px) => proxy.host != px.host && proxy.port != px.port);
     };
     addInActiveOne = (proxy) => {
       let isExist = false;
       this.inActiveProxies.map((px) => {
-        if (px.host === proxy.host) isExist = true;
+        if (px.host === proxy.host && px.port === proxy.port) isExist = true;
       });
       !isExist ? this.inActiveProxies.push(proxy) : null;
     };
     removeInActiveOne = (proxy) => {
-        this.inActiveProxies = this.inActiveProxies.filter((px) => proxy.host != px?.host);
+      this.inActiveProxies = this.inActiveProxies.filter((px) => proxy.host != px?.host && proxy.port != px?.port);
     };
     removeInActiveProxies = () => {
-        this.inActiveProxies = [];
+      this.inActiveProxies = [];
     };
     toProxyObject = async (stringProxy) => {
       let proxy = stringProxy.split(":");
@@ -88,11 +95,11 @@ export class Proxy {
         },
       };
       return proxy;
-    }; 
+    };
     checkInactiveProxiesHealth = async () => {
       this.inActiveProxies.forEach(async (proxy) => {
         const stillWork = await this.checkProxy(proxy);
-        if(stillWork){
+        if (stillWork) {
           this.removeInActiveOne(proxy);
           this.addActiveOne(proxy);
         }
