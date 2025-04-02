@@ -367,7 +367,7 @@ export const errorHandler = async (err, req, res, next) => {
 
 export const proxy_add = async (req, res) => {
   if (req.body?.proxies) {
-    await proxyStorage.addProxies([...req.body.proxies?.v6, ...req.body.proxies?.v6]);
+    await proxyStorage.addProxies([...req.body.proxies?.v6, ...req.body.proxies?.v6, ...req.body.proxies?.v4]);
     res.json({
       message: "proxies successfully received",
     });
