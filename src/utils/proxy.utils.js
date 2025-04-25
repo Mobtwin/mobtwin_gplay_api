@@ -9,9 +9,9 @@ export class Proxy {
 
   addProxies = async (stringProxies) => {
     await Promise.all(
-      stringProxies.forEach(async (proxy) => {
-        proxy = await this.toProxyObject(proxy)
-        await this.addProxy(proxy);
+      stringProxies.map(async (proxy) => {
+        let proxyObj = await this.toProxyObject(proxy)
+        await this.addProxy(proxyObj);
       })
     );
     return {
