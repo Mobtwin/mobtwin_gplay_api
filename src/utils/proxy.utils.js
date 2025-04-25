@@ -8,10 +8,12 @@ export class Proxy {
   currentProxyIndex = 0;
 
   addProxies = async (stringProxies) => {
-    stringProxies.forEach(async (proxy) => {
-      proxy = await this.toProxyObject(proxy)
-      await this.addProxy(proxy);
-    });
+    await Promise.all(
+      stringProxies.forEach(async (proxy) => {
+        proxy = await this.toProxyObject(proxy)
+        await this.addProxy(proxy);
+      })
+    );
     return {
       activeProxies: this.activeProxies,
       inActiveProxies: this.inActiveProxies,
