@@ -51,8 +51,8 @@ export class Proxy {
     checkActiveOne = async (proxy) => {
       let isActive = await this.checkProxy(proxy);
       if (!isActive) {
-        this.removeActiveOne(proxy);
-        this.addInActiveOne(proxy);
+        // this.removeActiveOne(proxy);
+        // this.addInActiveOne(proxy);
       }
     }
     getNextProxy = () => {
@@ -65,9 +65,9 @@ export class Proxy {
     };
     addActiveOne = (proxy) => {
       let isExist = false;
-      this.activeProxies.map((px) => {
-        if (px.host === proxy.host && px.port === proxy.port) isExist = true;
-      });
+      // this.activeProxies.map((px) => {
+      //   if (px.host === proxy.host && px.port === proxy.port) isExist = true;
+      // });
       !isExist ? this.activeProxies.push(proxy) : null;
     };
     removeActiveOne = (proxy) => {

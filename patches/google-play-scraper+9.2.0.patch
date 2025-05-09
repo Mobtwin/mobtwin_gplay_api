@@ -1,0 +1,35 @@
+diff --git a/node_modules/google-play-scraper/lib/app.js b/node_modules/google-play-scraper/lib/app.js
+index 36ddb06..8852ac4 100644
+--- a/node_modules/google-play-scraper/lib/app.js
++++ b/node_modules/google-play-scraper/lib/app.js
+@@ -16,7 +16,7 @@ function app (opts) {
+     }
+ 
+     opts.lang = opts.lang || 'en';
+-    opts.country = opts.country || 'us';
++    opts.country = opts.country || '';
+ 
+     const qs = queryString.stringify({
+       id: opts.appId,
+diff --git a/node_modules/google-play-scraper/lib/similar.js b/node_modules/google-play-scraper/lib/similar.js
+index 0256ca2..144279e 100644
+--- a/node_modules/google-play-scraper/lib/similar.js
++++ b/node_modules/google-play-scraper/lib/similar.js
+@@ -17,7 +17,7 @@ function similar (opts) {
+       {
+         appId: encodeURIComponent(opts.appId),
+         lang: opts.lang || 'en',
+-        country: opts.country || 'us',
++        country: opts.country || '',
+         fullDetail: opts.fullDetail
+       });
+ 
+@@ -27,7 +27,7 @@ function similar (opts) {
+       gl: mergedOpts.country
+     });
+ 
+-    const similarUrl = `${BASE_URL}/store/apps/details?${qs}`;
++    const similarUrl = `${BASE_URL}/store/apps/details?${qs}`;//https://play.google.com/store/apps/details?id=&hl=en&gl=US
+     const options = Object.assign({
+       url: similarUrl,
+       followRedirect: true
