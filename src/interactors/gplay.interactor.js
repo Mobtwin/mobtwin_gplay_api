@@ -161,10 +161,21 @@ export const getApps = async (req, res, next) => {
 export const getAppDetails = async (req, res, next) => {
   const appId = req.params.appId;
   const opt = req.query;
-  const proxy = proxyStorage.getNextProxy();
-  if (proxy) {
+  // const proxy = proxyStorage.getNextProxy();
+  const [host,port,username,password] = req.query.proxy.split(":");
+  const proxy = {
+    host,
+    port:parseInt(port),
+    auth:{
+      username,password
+    }
+  }
+  console.log({
+    proxy
+  })
+  // if (proxy) {
     gplay
-      .app({ appId, proxy, ...opt })
+      .app({ appId, proxy:!proxy.host ? undefined :proxy})
       //.then((app) => cleanUrls(req)(app))
       .then(res.json.bind(res))
       .catch((err) => {
@@ -178,9 +189,9 @@ export const getAppDetails = async (req, res, next) => {
           next(err);
         }
       });
-  } else {
-    res.json({ message: "no proxy available" });
-  }
+  // } else {
+  //   res.json({ message: "no proxy available" });
+  // }
 };
 
 //similar apps
