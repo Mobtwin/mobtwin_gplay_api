@@ -162,14 +162,20 @@ export const getApps = async (req, res, next) => {
 export const getAppDetails = async (req, res, next) => {
   const appId = req.params.appId;
   const opt = req.query;
+  let proxy;
   // const proxy = proxyStorage.getNextProxy();
-  const [host,port,username,password] = req.query.proxy.split(":");
-  const proxy = {
-    host,
-    port:parseInt(port),
-    auth:{
-      username,password
+  if (req.query.proxy) {
+    
+    const [host,port,username,password] = req.query.proxy.split(":");
+    proxy = {
+      host,
+      port:parseInt(port),
+      auth:{
+        username,password
+      }
     }
+  }else{
+    proxy = undefined;
   }
   const headers = generateGooglePlayHeaders();
 
@@ -178,7 +184,7 @@ export const getAppDetails = async (req, res, next) => {
   })
   // if (proxy) {
     gplay
-      .app({ appId, proxy:!proxy.host ? undefined :proxy,headers})
+      .app({ appId, proxy:!proxy ? undefined :proxy,headers})
       //.then((app) => cleanUrls(req)(app))
       .then(res.json.bind(res))
       .catch((err) => {
@@ -193,14 +199,20 @@ export const getAppDetails = async (req, res, next) => {
 export const getSimilarApps = async (req, res, next) => {
   // const proxy = proxyStorage.getNextProxy();
   // if (proxy) {
+  let proxy;
+  if (req.query.proxy) {
     const [host,port,username,password] = req.query.proxy.split(":");
-    const proxy = {
+    proxy = {
       host,
       port:parseInt(port),
       auth:{
         username,password
       }
     }
+  }else{
+    proxy =undefined;
+  }
+    
     console.log({proxy})
     const headers = generateGooglePlayHeaders();
     gplay
@@ -209,7 +221,7 @@ export const getSimilarApps = async (req, res, next) => {
         appId: req.params.appId,
         country: req.query.country,
         lang: req.query.lang,
-        proxy,
+        proxy:proxy,
         headers
       })
       .then((apps) => apps.map(cleanUrls(req)))
