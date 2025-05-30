@@ -2,6 +2,7 @@ import g_play from "g-scraper";
 import qs from "querystring";
 import { buildUrl, cleanUrls, isObject, toList } from "../utils/app.utils.js";
 import { Proxy } from "../utils/proxy.utils.js";
+import { generateGooglePlayHeaders } from "../utils/headers.js";
 
 const THROTTLE = undefined;
 
@@ -170,24 +171,18 @@ export const getAppDetails = async (req, res, next) => {
       username,password
     }
   }
+  const headers = generateGooglePlayHeaders();
+
   console.log({
     proxy
   })
   // if (proxy) {
     gplay
-      .app({ appId, proxy:!proxy.host ? undefined :proxy})
+      .app({ appId, proxy:!proxy.host ? undefined :proxy,headers})
       //.then((app) => cleanUrls(req)(app))
       .then(res.json.bind(res))
       .catch((err) => {
-        if (
-          err.message ===
-          "Error requesting Google Play:timeout of 5000ms exceeded"
-        ) {
-          proxyStorage.checkActiveOne(proxy);
-          getAppDetails(req, res, next);
-        } else {
           next(err);
-        }
       });
   // } else {
   //   res.json({ message: "no proxy available" });
@@ -196,8 +191,18 @@ export const getAppDetails = async (req, res, next) => {
 
 //similar apps
 export const getSimilarApps = async (req, res, next) => {
-  const proxy = proxyStorage.getNextProxy();
-  if (proxy) {
+  // const proxy = proxyStorage.getNextProxy();
+  // if (proxy) {
+    const [host,port,username,password] = req.query.proxy.split(":");
+    const proxy = {
+      host,
+      port:parseInt(port),
+      auth:{
+        username,password
+      }
+    }
+    console.log({proxy})
+    const headers = generateGooglePlayHeaders();
     gplay
       .similar({
         throttle: THROTTLE,
@@ -205,24 +210,17 @@ export const getSimilarApps = async (req, res, next) => {
         country: req.query.country,
         lang: req.query.lang,
         proxy,
+        headers
       })
       .then((apps) => apps.map(cleanUrls(req)))
       .then(toList)
       .then(res.json.bind(res))
       .catch((err) => {
-        if (
-          err.message ===
-          "Error requesting Google Play:timeout of 5000ms exceeded"
-        ) {
-          proxyStorage.checkActiveOne(proxy);
-          getSimilarApps(req, res, next);
-        } else {
           next(err);
-        }
       });
-  } else {
-    res.json({ message: "no proxy available" });
-  }
+  // } else {
+  //   res.json({ message: "no proxy available" });
+  // }
 };
 
 // app data safety
