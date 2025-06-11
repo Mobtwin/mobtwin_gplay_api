@@ -341,32 +341,40 @@ export const getAppReviews = async (req, res, next) => {
 
 // developer apps
 export const getDeveloperApps = async (req, res, next) => {
-  const proxy = proxyStorage.getNextProxy();
+  let proxy;
+  // const proxy = proxyStorage.getNextProxy();
+  if (req.query.proxy) {
+    
+    const [host,port,username,password] = req.query.proxy.split(":");
+    proxy = {
+      host,
+      port:parseInt(port),
+      auth:{
+        username,password
+      }
+    }
+  }else{
+    proxy = undefined;
+  }
+
+  console.log({
+    proxy
+  })
   const opts = { devId: req.params.devId, ...req.query, proxy };
-  if (proxy) {
     gplay
       .developer(opts)
       .then((apps) => apps.map(cleanUrls(req)))
       .then((apps) => ({
         devId: req.params.devId,
         apps,
-        proxy: proxyStorage.getNextProxy(),
+        proxy,
       }))
       .then(res.json.bind(res))
       .catch((err) => {
-        if (
-          err.message ===
-          "Error requesting Google Play:timeout of 5000ms exceeded"
-        ) {
-          proxyStorage.checkActiveOne(proxy);
-          getDeveloperApps(req, res, next);
-        } else {
+        
           next(err);
-        }
       });
-  } else {
-    res.json({ message: "no proxy available" });
-  }
+
 };
 
 // categories
